@@ -4,7 +4,8 @@ export async function fetchWrapper(
   body?: object | FormData,
   accessToken?: string,
   isFormData?: boolean,
-  headers?: object
+  headers?: object,
+  tags?: Array<string>
 ) {
   const contentType = isFormData ? undefined : { "Content-Type": "application/json" };
   return fetch(
@@ -17,10 +18,19 @@ export async function fetchWrapper(
       },
       method,
       body: isFormData ? (body as FormData) : JSON.stringify(body),
+      next: {
+        tags: tags,
+      },
     }
   );
 }
 
-export async function fetchSimple(path: string) {
-  return fetch(path);
+export async function fetchSimple(path: string, tags?: Array<string>) {
+  if (!tags) return fetch(path);
+
+  return fetch(path, {
+    next: {
+      tags: tags ?? undefined,
+    },
+  });
 }
